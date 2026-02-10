@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.named-workspaces"
+          path="/org/gnome/shell/extensions/named-workspaces/">
+    <key name="workspace-names" type="as">
+      <default>[]</default>
+      <summary>Workspace names</summary>
+      <description>Custom workspace names indexed by workspace index</description>
+    </key>
+    <key name="workspace-styles" type="as">
+      <default>[]</default>
+      <summary>Per-workspace styles</summary>
+      <description>JSON-encoded style objects indexed by workspace index</description>
+    </key>
+    <key name="global-style" type="s">
+      <default>''</default>
+      <summary>Global style</summary>
+      <description>JSON-encoded style object applied to all workspaces</description>
+    </key>
+    <key name="panel-position" type="s">
+      <default>'right'</default>
+      <summary>Panel position</summary>
+      <description>Which panel box to place the indicator in: left, center, or right</description>
+    </key>
+    <key name="font-size" type="i">
+      <default>0</default>
+      <summary>Base font size</summary>
+      <description>Base font size in pixels for the workspace label. 0 means use the default shell font size.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,98 @@
+.workspace-name-label {
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.workspace-name-entry {
+  width: 12em;
+  padding: 0 8px;
+  color: #ffffff;
+}
+
+/* Menu styles */
+.wn-menu-label {
+  min-width: 80px;
+  padding-right: 8px;
+}
+
+.wn-menu-entry {
+  min-width: 120px;
+}
+
+.wn-color-preview {
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  margin-right: 6px;
+}
+
+/* Button groups (scope toggle, font size, position, bold/italic) */
+.wn-btn-group {
+  spacing: 4px;
+}
+
+.wn-btn {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wn-btn:hover {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.wn-btn-active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Workspace list */
+.wn-ws-item-active {
+  font-weight: bold;
+}
+
+.wn-ws-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  margin-right: 8px;
+}
+
+.wn-ws-dot-inactive {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: transparent;
+  margin-right: 8px;
+}
+
+/* Color swatch row */
+.wn-swatch-row {
+  spacing: 4px;
+  padding: 4px 0;
+}
+
+.wn-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.wn-swatch:hover {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.wn-swatch-clear {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: transparent;
+}
+
+.wn-swatch-clear:hover {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
