@@ -36,11 +36,17 @@ glib-compile-schemas schemas/
 gnome-extensions enable named-workspaces@a31.at
 ```
 
+## Screenshots
+
+![Screenshot 1](screenshots/01.png)
+![Screenshot 2](screenshots/02.png)
+![Screenshot 3](screenshots/03.png)
+
 ## Publish
 
 ```bash
 glib-compile-schemas schemas/
 zip -r named-workspaces@a31.at.zip \
-    metadata.json extension.js prefs.js stylesheet.css \
+    metadata.json extension.js prefs.js stylesheet.css LICENSE \
     schemas/
 ```
