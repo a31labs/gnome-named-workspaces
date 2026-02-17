@@ -48,5 +48,5 @@ gnome-extensions enable named-workspaces@a31.at
 glib-compile-schemas schemas/
 zip -r named-workspaces@a31.at.zip \
     metadata.json extension.js prefs.js stylesheet.css LICENSE \
-    schemas/
+    schemas/org.gnome.shell.extensions.named-workspaces.gschema.xml
 ```

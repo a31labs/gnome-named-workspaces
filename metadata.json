@@ -3,5 +3,9 @@
   "name": "Named Workspaces",
   "description": "Displays the current workspace name in the top panel with inline editing via double-click",
   "shell-version": ["45", "46", "47", "48", "49"],
-  "settings-schema": "org.gnome.shell.extensions.named-workspaces"
+  "settings-schema": "org.gnome.shell.extensions.named-workspaces",
+  "url": "https://github.com/a31labs/gnome-named-workspaces",
+  "donations": {
+    "buymeacoffee": "axrider"
+  }
 }

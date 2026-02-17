@@ -18,7 +18,7 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
     _init(extension) {
         super._init(0.0, 'Workspace Name Indicator');
 
-        this._settings = extension.getSettings();
+        this._settings = extension._settings;
         this._editing = false;
         this._boldActive = false;
         this._italicActive = false;
@@ -578,57 +578,55 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
     }
 
     _connectSignals() {
-        const wm = global.workspace_manager;
-
-        this._wsChangedId = wm.connect('active-workspace-changed', () => {
-            this._cancelEdit();
-            if (this.menu.isOpen) {
-                this._commitMenuChanges();
-                this._buildWorkspaceList();
-                this._populateMenu();
-            }
-            this._updateLabel();
-        });
-
-        this._wsCountId = wm.connect('notify::n-workspaces', () => {
-            if (this.menu.isOpen)
-                this._buildWorkspaceList();
-            this._updateLabel();
-        });
-
-        this._activateId = this._clutterText.connect('activate', () => {
-            this._commitEdit();
-        });
-
-        this._keyPressId = this._clutterText.connect('key-press-event', (_actor, event) => {
-            if (event.get_key_symbol() === Clutter.KEY_Escape) {
+        global.workspace_manager.connectObject(
+            'active-workspace-changed', () => {
                 this._cancelEdit();
-                return Clutter.EVENT_STOP;
-            }
-            return Clutter.EVENT_PROPAGATE;
-        });
-
-        this._focusOutId = this._clutterText.connect('key-focus-out', () => {
-            if (this._editing)
-                this._commitEdit();
-        });
-
-        this._settingsId = this._settings.connect('changed::workspace-names', () => {
-            if (!this._editing)
+                if (this.menu.isOpen) {
+                    this._commitMenuChanges();
+                    this._buildWorkspaceList();
+                    this._populateMenu();
+                }
                 this._updateLabel();
-        });
+            },
+            'notify::n-workspaces', () => {
+                if (this.menu.isOpen)
+                    this._buildWorkspaceList();
+                this._updateLabel();
+            },
+            this);
 
-        this._wsStylesId = this._settings.connect('changed::workspace-styles', () => {
-            this._updateLabel();
-        });
+        this._clutterText.connectObject(
+            'activate', () => {
+                this._commitEdit();
+            },
+            'key-press-event', (_actor, event) => {
+                if (event.get_key_symbol() === Clutter.KEY_Escape) {
+                    this._cancelEdit();
+                    return Clutter.EVENT_STOP;
+                }
+                return Clutter.EVENT_PROPAGATE;
+            },
+            'key-focus-out', () => {
+                if (this._editing)
+                    this._commitEdit();
+            },
+            this);
 
-        this._globalStyleId = this._settings.connect('changed::global-style', () => {
-            this._updateLabel();
-        });
-
-        this._fontSizeId = this._settings.connect('changed::font-size', () => {
-            this._updateLabel();
-        });
+        this._settings.connectObject(
+            'changed::workspace-names', () => {
+                if (!this._editing)
+                    this._updateLabel();
+            },
+            'changed::workspace-styles', () => {
+                this._updateLabel();
+            },
+            'changed::global-style', () => {
+                this._updateLabel();
+            },
+            'changed::font-size', () => {
+                this._updateLabel();
+            },
+            this);
     }
 
     _getMenuIndex() {
@@ -698,44 +696,9 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
     }
 
     _disconnectSignals() {
-        const wm = global.workspace_manager;
-
-        if (this._wsChangedId) {
-            wm.disconnect(this._wsChangedId);
-            this._wsChangedId = 0;
-        }
-        if (this._wsCountId) {
-            wm.disconnect(this._wsCountId);
-            this._wsCountId = 0;
-        }
-        if (this._activateId) {
-            this._clutterText.disconnect(this._activateId);
-            this._activateId = 0;
-        }
-        if (this._keyPressId) {
-            this._clutterText.disconnect(this._keyPressId);
-            this._keyPressId = 0;
-        }
-        if (this._focusOutId) {
-            this._clutterText.disconnect(this._focusOutId);
-            this._focusOutId = 0;
-        }
-        if (this._settingsId) {
-            this._settings.disconnect(this._settingsId);
-            this._settingsId = 0;
-        }
-        if (this._wsStylesId) {
-            this._settings.disconnect(this._wsStylesId);
-            this._wsStylesId = 0;
-        }
-        if (this._globalStyleId) {
-            this._settings.disconnect(this._globalStyleId);
-            this._globalStyleId = 0;
-        }
-        if (this._fontSizeId) {
-            this._settings.disconnect(this._fontSizeId);
-            this._fontSizeId = 0;
-        }
+        global.workspace_manager.disconnectObject(this);
+        this._clutterText.disconnectObject(this);
+        this._settings.disconnectObject(this);
     }
 
     destroy() {
@@ -757,9 +720,9 @@ export default class WorkspaceNameExtension extends Extension {
         const index = pos === 'left' ? -1 : 0;
         Main.panel.addToStatusArea(this.uuid, this._indicator, index, pos);
 
-        this._positionChangedId = this._settings.connect('changed::panel-position', () => {
+        this._settings.connectObject('changed::panel-position', () => {
             this._repositionIndicator();
-        });
+        }, this);
     }
 
     _repositionIndicator() {
@@ -788,12 +751,9 @@ export default class WorkspaceNameExtension extends Extension {
     }
 
     disable() {
-        if (this._positionChangedId) {
-            this._settings.disconnect(this._positionChangedId);
-            this._positionChangedId = 0;
-        }
-        this._settings = null;
+        this._settings.disconnectObject(this);
         this._indicator?.destroy();
         this._indicator = null;
+        this._settings = null;
     }
 }
