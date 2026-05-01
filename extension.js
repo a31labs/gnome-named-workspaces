@@ -588,6 +588,9 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
                 }
                 this._updateLabel();
             },
+            'workspace-removed', (_wm, index) => {
+                this._removeWorkspaceData(index);
+            },
             'notify::n-workspaces', () => {
                 if (this.menu.isOpen)
                     this._buildWorkspaceList();
@@ -627,6 +630,20 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
                 this._updateLabel();
             },
             this);
+    }
+
+    _removeWorkspaceData(index) {
+        const names = this._settings.get_strv('workspace-names');
+        if (index < names.length) {
+            names.splice(index, 1);
+            this._settings.set_strv('workspace-names', names);
+        }
+
+        const styles = this._settings.get_strv('workspace-styles');
+        if (index < styles.length) {
+            styles.splice(index, 1);
+            this._settings.set_strv('workspace-styles', styles);
+        }
     }
 
     _getMenuIndex() {
