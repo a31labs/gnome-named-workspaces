@@ -68,6 +68,28 @@
   margin-right: 8px;
 }
 
+/* Workspace reorder buttons */
+.wn-reorder-box {
+  spacing: 2px;
+  margin-left: 8px;
+}
+
+.wn-reorder-btn {
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 8px;
+  min-width: 16px;
+  min-height: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid transparent;
+}
+
+.wn-reorder-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Color swatch row */
 .wn-swatch-row {
   spacing: 4px;

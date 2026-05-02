@@ -391,6 +391,37 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
                 label.add_style_class_name('wn-ws-item-active');
             box.add_child(label);
 
+            if (nWorkspaces > 1) {
+                const arrowBox = new St.BoxLayout({style_class: 'wn-reorder-box'});
+
+                if (i > 0) {
+                    const upBtn = new St.Button({
+                        style_class: 'wn-reorder-btn',
+                        label: '\u25B2',
+                        y_align: Clutter.ActorAlign.CENTER,
+                    });
+                    const fromUp = i;
+                    upBtn.connect('clicked', () => {
+                        this._moveWorkspace(fromUp, fromUp - 1);
+                    });
+                    arrowBox.add_child(upBtn);
+                }
+
+                if (i < nWorkspaces - 1) {
+                    const downBtn = new St.Button({
+                        style_class: 'wn-reorder-btn',
+                        label: '\u25BC',
+                        y_align: Clutter.ActorAlign.CENTER,
+                    });
+                    const fromDown = i;
+                    downBtn.connect('clicked', () => {
+                        this._moveWorkspace(fromDown, fromDown + 1);
+                    });
+                    arrowBox.add_child(downBtn);
+                }
+
+                box.add_child(arrowBox);
+            }
             item.add_child(box);
 
             const wsIndex = i;
@@ -403,6 +434,37 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             this._wsSection.addMenuItem(item);
             this._wsItems.push(item);
         }
+    }
+
+    _moveWorkspace(fromIndex, toIndex) {
+        const wm = global.workspace_manager;
+        const ws = wm.get_workspace_by_index(fromIndex);
+        if (!ws)
+            return;
+
+        // Reorder the actual GNOME workspace
+        wm.reorder_workspace(ws, toIndex);
+
+        // Shift workspace-names array to match
+        const names = this._settings.get_strv('workspace-names');
+        this._swapArrayEntry(names, fromIndex, toIndex);
+        this._settings.set_strv('workspace-names', names);
+
+        // Shift workspace-styles array to match
+        const styles = this._settings.get_strv('workspace-styles');
+        this._swapArrayEntry(styles, fromIndex, toIndex);
+        this._settings.set_strv('workspace-styles', styles);
+
+        // Rebuild list to reflect new order
+        this._buildWorkspaceList();
+        this._populateMenu();
+    }
+
+    _swapArrayEntry(arr, fromIndex, toIndex) {
+        while (arr.length <= Math.max(fromIndex, toIndex))
+            arr.push('');
+        const [removed] = arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, removed);
     }
 
     _setFontSize(size) {
