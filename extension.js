@@ -329,14 +329,14 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             this._updateLabel();
         });
 
-        this.menu.connect('open-state-changed', (_menu, isOpen) => {
+        this.menu.connectObject('open-state-changed', (_menu, isOpen) => {
             if (isOpen) {
                 this._buildWorkspaceList();
                 this._populateMenu();
             } else {
                 this._commitMenuChanges();
             }
-        });
+        }, this);
     }
 
     _createSwatchRow(targetEntry) {
@@ -778,6 +778,7 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
         global.workspace_manager.disconnectObject(this);
         this._clutterText.disconnectObject(this);
         this._settings.disconnectObject(this);
+        this.menu.disconnectObject(this);
     }
 
     destroy() {
