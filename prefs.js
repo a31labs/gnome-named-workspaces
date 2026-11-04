@@ -62,10 +62,27 @@ export default class WorkspaceNamePreferences extends ExtensionPreferences {
 
     _buildGlobalStyleGroup(page, settings) {
         const group = new Adw.PreferencesGroup({
-            title: 'Global Style',
+            title: 'Workspace Defaults',
             description: 'Applied to all workspaces unless overridden',
         });
         page.add(group);
+
+        // Default Name Template
+        const templateEntry = new Gtk.Entry({
+            text: settings.get_string('default-name-template'),
+            placeholder_text: 'Workspace {n}',
+            valign: Gtk.Align.CENTER,
+            width_chars: 16,
+        });
+        templateEntry.connect('changed', () => {
+            settings.set_string('default-name-template', templateEntry.get_text());
+        });
+        const templateRow = new Adw.ActionRow({
+            title: 'Default Name',
+            subtitle: 'Name for unnamed workspaces; {n} is the workspace number',
+        });
+        templateRow.add_suffix(templateEntry);
+        group.add(templateRow);
 
         let globalStyle = {};
         const raw = settings.get_string('global-style');

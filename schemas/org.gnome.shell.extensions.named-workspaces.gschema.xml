@@ -17,6 +17,11 @@
       <summary>Global style</summary>
       <description>JSON-encoded style object applied to all workspaces</description>
     </key>
+    <key name="default-name-template" type="s">
+      <default>'Workspace {n}'</default>
+      <summary>Default workspace name template</summary>
+      <description>Name used for workspaces without a custom name. {n} is replaced by the workspace number.</description>
+    </key>
     <key name="panel-position" type="s">
       <default>'right'</default>
       <summary>Panel position</summary>

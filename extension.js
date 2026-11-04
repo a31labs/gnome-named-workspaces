@@ -383,7 +383,7 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             box.add_child(dot);
 
             const label = new St.Label({
-                text: this._getWorkspaceName(i),
+                text: this._getWorkspaceName(i) || '<unnamed workspace>',
                 y_align: Clutter.ActorAlign.CENTER,
                 x_expand: true,
             });
@@ -713,6 +713,9 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             'changed::font-size', () => {
                 this._updateLabel();
             },
+            'changed::default-name-template', () => {
+                this._updateLabel();
+            },
             this);
     }
 
@@ -752,7 +755,8 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
     }
 
     _getDefaultName(index) {
-        return `Workspace ${index + 1}`;
+        return this._settings.get_string('default-name-template')
+            .replaceAll('{n}', index + 1);
     }
 
     _updateLabel() {
