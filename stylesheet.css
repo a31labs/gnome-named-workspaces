@@ -10,6 +10,13 @@
 }
 
 /* Menu styles */
+.wn-subheading {
+  font-size: 0.85em;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.55);
+  padding-top: 4px;
+}
+
 .wn-menu-label {
   min-width: 80px;
   padding-right: 8px;
@@ -17,6 +24,14 @@
 
 .wn-menu-entry {
   min-width: 120px;
+}
+
+.wn-hex-entry {
+  width: 80px;
+}
+
+.wn-typo-row {
+  spacing: 16px;
 }
 
 .wn-color-preview {

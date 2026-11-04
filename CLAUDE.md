@@ -33,7 +33,7 @@ There is no test framework, linter, or bundler. Changes are tested by restarting
 | File | Purpose |
 |---|---|
 | `extension.js` | Main extension. Contains `WorkspaceNameIndicator` (panel button with label, inline entry, and popup menu) and `WorkspaceNameExtension` (enable/disable lifecycle). |
-| `prefs.js` | Preferences window using libadwaita (`Adw`) and GTK4. Configures panel position, font size, and global style. |
+| `prefs.js` | Preferences window using libadwaita (`Adw`) and GTK4. Configures panel position, font size, default name template, and global style. |
 | `metadata.json` | Extension identity: UUID `named-workspaces@a31.at`, supported shell versions. |
 | `schemas/*.gschema.xml` | GSettings schema defining persisted settings. |
 | `stylesheet.css` | St (Shell Toolkit) CSS for the panel indicator and popup menu widgets. |
@@ -45,4 +45,5 @@ There is no test framework, linter, or bundler. Changes are tested by restarting
 - **Style layering**: `_getEffectiveStyle()` merges base font-size → global style → per-workspace style (last wins).
 - **Signal management**: All GObject signal connections are tracked by ID and disconnected in `destroy()`/`_disconnectSignals()`. This pattern is required to avoid crashes on extension disable.
 - **Panel button events**: `vfunc_event` overrides the default PanelMenu.Button behavior to implement single-click (menu toggle with 250ms debounce) and double-click (inline edit).
+- **Popup menu layout**: Workspaces list → scope toggle ("This Workspace" / "All Workspaces") → Name + Style → Panel Position. The scope toggle drives both sections: in "All Workspaces" the name field edits `default-name-template` and the style fields edit `global-style`.
 - **Preferences**: Uses `ExtensionPreferences` base class with `fillPreferencesWindow()` building Adw widgets. This is the GNOME 45+ prefs API.

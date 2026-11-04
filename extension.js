@@ -94,8 +94,29 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
         this._wsSection = new PopupMenu.PopupMenuSection();
         this.menu.addMenuItem(this._wsSection);
 
-        // ===== Name section =====
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Name'));
+        // ===== Customize section: scope toggle drives Name + Style below =====
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Customize'));
+
+        // --- Scope toggle ---
+        const scopeItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        const scopeBox = new St.BoxLayout({style_class: 'wn-btn-group', x_expand: true});
+        this._scopeWorkspaceBtn = new St.Button({
+            label: 'This Workspace',
+            style_class: 'wn-btn wn-btn-active',
+            x_expand: true,
+        });
+        this._scopeGlobalBtn = new St.Button({
+            label: 'All Workspaces',
+            style_class: 'wn-btn',
+            x_expand: true,
+        });
+        scopeBox.add_child(this._scopeWorkspaceBtn);
+        scopeBox.add_child(this._scopeGlobalBtn);
+        scopeItem.add_child(scopeBox);
+        this.menu.addMenuItem(scopeItem);
+
+        // --- Name ---
+        this._nameHeading = this._addSubheading('Name');
 
         const nameItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
         this._menuNameEntry = new St.Entry({
@@ -108,139 +129,114 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
         nameItem.add_child(this._menuNameEntry);
         this.menu.addMenuItem(nameItem);
 
-        // ===== Style section =====
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Style'));
+        // --- Style ---
+        this._addSubheading('Style');
 
-        // --- Scope toggle ---
-        const scopeItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        const scopeBox = new St.BoxLayout({style_class: 'wn-btn-group'});
-        this._scopeWorkspaceBtn = new St.Button({
-            label: 'This Workspace',
-            style_class: 'wn-btn wn-btn-active',
-        });
-        this._scopeGlobalBtn = new St.Button({
-            label: 'All Workspaces',
-            style_class: 'wn-btn',
-        });
-        scopeBox.add_child(this._scopeWorkspaceBtn);
-        scopeBox.add_child(this._scopeGlobalBtn);
-        scopeItem.add_child(scopeBox);
-        this.menu.addMenuItem(scopeItem);
+        // --- Color row: target toggle + hex field of the selected target ---
+        // Both entries stay alive (save/load reads them); only one is visible
+        const colorItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        const targetBox = new St.BoxLayout({style_class: 'wn-btn-group', x_expand: true});
+        this._targetBgBtn = new St.Button({label: 'Background', style_class: 'wn-btn wn-btn-active'});
+        this._targetTextBtn = new St.Button({label: 'Text', style_class: 'wn-btn'});
+        targetBox.add_child(this._targetBgBtn);
+        targetBox.add_child(this._targetTextBtn);
+        colorItem.add_child(targetBox);
 
-        // --- Background color row ---
-        const bgItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        bgItem.add_child(new St.Label({
-            text: 'Background',
-            style_class: 'wn-menu-label',
-            y_align: Clutter.ActorAlign.CENTER,
-        }));
         this._bgPreview = new St.Widget({
             style_class: 'wn-color-preview',
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._bgEntry = new St.Entry({
-            style_class: 'wn-menu-entry',
+            style_class: 'wn-hex-entry',
             hint_text: '#000000',
             can_focus: true,
-            x_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        bgItem.add_child(this._bgPreview);
-        bgItem.add_child(this._bgEntry);
-        this.menu.addMenuItem(bgItem);
-
-        // --- Background swatches ---
-        const bgSwatchItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        bgSwatchItem.add_child(this._createSwatchRow(this._bgEntry));
-        this.menu.addMenuItem(bgSwatchItem);
-
-        // --- Text color row ---
-        const colorItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        colorItem.add_child(new St.Label({
-            text: 'Text',
-            style_class: 'wn-menu-label',
-            y_align: Clutter.ActorAlign.CENTER,
-        }));
         this._colorPreview = new St.Widget({
             style_class: 'wn-color-preview',
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._colorEntry = new St.Entry({
-            style_class: 'wn-menu-entry',
+            style_class: 'wn-hex-entry',
             hint_text: '#ffffff',
             can_focus: true,
-            x_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
         });
+        colorItem.add_child(this._bgPreview);
+        colorItem.add_child(this._bgEntry);
         colorItem.add_child(this._colorPreview);
         colorItem.add_child(this._colorEntry);
         this.menu.addMenuItem(colorItem);
 
-        // --- Text color swatches ---
-        const colorSwatchItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        colorSwatchItem.add_child(this._createSwatchRow(this._colorEntry));
-        this.menu.addMenuItem(colorSwatchItem);
+        // --- Swatches (apply to the selected target) ---
+        const swatchItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        swatchItem.add_child(this._createSwatchRow());
+        this.menu.addMenuItem(swatchItem);
 
-        // --- Bold + Italic row ---
-        const toggleItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        // --- Typography row: B I | S M L ---
+        const typoItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        const typoBox = new St.BoxLayout({style_class: 'wn-typo-row'});
         const toggleBox = new St.BoxLayout({style_class: 'wn-btn-group'});
         this._boldBtn = new St.Button({
             style_class: 'wn-btn',
-            label: 'Bold',
+            label: 'B',
+            style: 'font-weight: bold;',
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._italicBtn = new St.Button({
             style_class: 'wn-btn',
-            label: 'Italic',
+            label: 'I',
+            style: 'font-style: italic;',
             y_align: Clutter.ActorAlign.CENTER,
         });
         toggleBox.add_child(this._boldBtn);
         toggleBox.add_child(this._italicBtn);
-        toggleItem.add_child(toggleBox);
-        this.menu.addMenuItem(toggleItem);
 
-        // --- Font size row ---
-        const sizeItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
         const sizeBox = new St.BoxLayout({style_class: 'wn-btn-group'});
         this._sizeSmallBtn = new St.Button({
-            label: 'Small',
+            label: 'S',
             style_class: 'wn-btn',
         });
         this._sizeDefaultBtn = new St.Button({
-            label: 'Default',
+            label: 'M',
             style_class: 'wn-btn wn-btn-active',
         });
         this._sizeLargeBtn = new St.Button({
-            label: 'Large',
+            label: 'L',
             style_class: 'wn-btn',
         });
         sizeBox.add_child(this._sizeSmallBtn);
         sizeBox.add_child(this._sizeDefaultBtn);
         sizeBox.add_child(this._sizeLargeBtn);
-        sizeItem.add_child(sizeBox);
-        this.menu.addMenuItem(sizeItem);
 
-        // --- Separator + Reset ---
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        typoBox.add_child(toggleBox);
+        typoBox.add_child(sizeBox);
+        typoItem.add_child(typoBox);
+        this.menu.addMenuItem(typoItem);
+
+        // --- Reset ---
         this._resetItem = new PopupMenu.PopupMenuItem('Reset Style');
         this.menu.addMenuItem(this._resetItem);
 
         // ===== Position section =====
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Position'));
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem('Panel Position'));
 
         const posItem = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
-        const posBox = new St.BoxLayout({style_class: 'wn-btn-group'});
+        const posBox = new St.BoxLayout({style_class: 'wn-btn-group', x_expand: true});
         this._posLeftBtn = new St.Button({
             label: 'Left',
             style_class: 'wn-btn',
+            x_expand: true,
         });
         this._posCenterBtn = new St.Button({
             label: 'Center',
             style_class: 'wn-btn',
+            x_expand: true,
         });
         this._posRightBtn = new St.Button({
             label: 'Right',
             style_class: 'wn-btn',
+            x_expand: true,
         });
         posBox.add_child(this._posLeftBtn);
         posBox.add_child(this._posCenterBtn);
@@ -270,6 +266,9 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             this._liveUpdateLabel();
         });
 
+        this._targetBgBtn.connect('clicked', () => this._setColorTarget('bg'));
+        this._targetTextBtn.connect('clicked', () => this._setColorTarget('text'));
+
         this._boldBtn.connect('clicked', () => {
             this._boldActive = !this._boldActive;
             if (this._boldActive)
@@ -294,17 +293,21 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
 
         this._scopeWorkspaceBtn.connect('clicked', () => {
             if (this._styleScope === 'workspace') return;
+            this._saveNameFromMenu();
             this._saveCurrentStyle();
             this._styleScope = 'workspace';
             this._updateScopeToggle();
+            this._populateNameField();
             this._populateStyleFields();
         });
 
         this._scopeGlobalBtn.connect('clicked', () => {
             if (this._styleScope === 'global') return;
+            this._saveNameFromMenu();
             this._saveCurrentStyle();
             this._styleScope = 'global';
             this._updateScopeToggle();
+            this._populateNameField();
             this._populateStyleFields();
         });
 
@@ -339,14 +342,40 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
         }, this);
     }
 
-    _createSwatchRow(targetEntry) {
+    // Lighter than a separator so Name/Style read as part of the Customize section
+    _addSubheading(text) {
+        const item = new PopupMenu.PopupBaseMenuItem({reactive: false, can_focus: false});
+        const label = new St.Label({text, style_class: 'wn-subheading'});
+        item.add_child(label);
+        this.menu.addMenuItem(item);
+        return label;
+    }
+
+    _setColorTarget(target) {
+        const bg = target === 'bg';
+        this._colorTarget = target;
+        for (const [btn, active] of [[this._targetBgBtn, bg], [this._targetTextBtn, !bg]]) {
+            if (active)
+                btn.add_style_class_name('wn-btn-active');
+            else
+                btn.remove_style_class_name('wn-btn-active');
+        }
+        this._bgPreview.visible = this._bgEntry.visible = bg;
+        this._colorPreview.visible = this._colorEntry.visible = !bg;
+    }
+
+    _activeColorEntry() {
+        return this._colorTarget === 'text' ? this._colorEntry : this._bgEntry;
+    }
+
+    _createSwatchRow() {
         const row = new St.BoxLayout({style_class: 'wn-swatch-row'});
 
         for (const color of SWATCH_COLORS) {
             const swatch = new St.Button({style_class: 'wn-swatch'});
             swatch.set_style(`background-color: ${color};`);
             swatch.connect('clicked', () => {
-                targetEntry.set_text(color);
+                this._activeColorEntry().set_text(color);
             });
             row.add_child(swatch);
         }
@@ -357,7 +386,7 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
             label: '\u2715',
         });
         clearBtn.connect('clicked', () => {
-            targetEntry.set_text('');
+            this._activeColorEntry().set_text('');
         });
         row.add_child(clearBtn);
 
@@ -516,10 +545,11 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
 
     _populateMenu() {
         this._menuWorkspaceIndex = global.workspace_manager.get_active_workspace_index();
-        this._menuNameEntry.set_text(this._getWorkspaceName(this._menuWorkspaceIndex));
         this._styleScope = 'workspace';
         this._updateScopeToggle();
+        this._populateNameField();
         this._populateStyleFields();
+        this._setColorTarget('bg');
         this._updatePositionToggle();
     }
 
@@ -582,8 +612,21 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
         this._setFontSize(style['font-size'] || '');
     }
 
+    // 'All Workspaces' edits the default-name template instead of a name
+    _populateNameField() {
+        const isGlobal = this._styleScope === 'global';
+        this._nameHeading.text = isGlobal ? 'Name Template ({n} = number)' : 'Name';
+        this._menuNameEntry.hint_text = isGlobal ? 'Workspace {n}' : 'Workspace name\u2026';
+        this._menuNameEntry.set_text(isGlobal
+            ? this._settings.get_string('default-name-template')
+            : this._getWorkspaceName(this._getMenuIndex()));
+    }
+
     _saveNameFromMenu() {
-        this._setWorkspaceName(this._getMenuIndex(), this._menuNameEntry.get_text());
+        if (this._styleScope === 'global')
+            this._settings.set_string('default-name-template', this._menuNameEntry.get_text());
+        else
+            this._setWorkspaceName(this._getMenuIndex(), this._menuNameEntry.get_text());
     }
 
     _setWorkspaceName(index, name) {
