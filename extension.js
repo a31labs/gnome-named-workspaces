@@ -761,7 +761,8 @@ class WorkspaceNameIndicator extends PanelMenu.Button {
 
     _updateLabel() {
         const index = global.workspace_manager.get_active_workspace_index();
-        this._label.set_text(this._getWorkspaceName(index));
+        // Empty template would collapse the button to an unclickable sliver
+        this._label.set_text(this._getWorkspaceName(index) || `${index + 1}`);
 
         const style = this._getEffectiveStyle(index);
         const css = this._styleToCss(style);

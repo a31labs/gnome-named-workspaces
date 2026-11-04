@@ -58,14 +58,6 @@ export default class WorkspaceNamePreferences extends ExtensionPreferences {
             settings.set_int('font-size', Math.round(fontRow.value));
         });
         group.add(fontRow);
-    }
-
-    _buildGlobalStyleGroup(page, settings) {
-        const group = new Adw.PreferencesGroup({
-            title: 'Workspace Defaults',
-            description: 'Applied to all workspaces unless overridden',
-        });
-        page.add(group);
 
         // Default Name Template
         const templateEntry = new Gtk.Entry({
@@ -83,6 +75,14 @@ export default class WorkspaceNamePreferences extends ExtensionPreferences {
         });
         templateRow.add_suffix(templateEntry);
         group.add(templateRow);
+    }
+
+    _buildGlobalStyleGroup(page, settings) {
+        const group = new Adw.PreferencesGroup({
+            title: 'Global Style',
+            description: 'Applied to all workspaces unless overridden',
+        });
+        page.add(group);
 
         let globalStyle = {};
         const raw = settings.get_string('global-style');
